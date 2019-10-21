@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block page_title %}
-    <title>{% trans "Successful deployment" %} - ikwen Foulassi</title>
+    <title>{% blocktrans %}Partnership invitation from {{ company_name }}{% endblocktrans %} - ikwen Daraja</title>
 {% endblock %}
 
 {% block head_style %}
@@ -20,6 +20,8 @@
     <style>
         footer {position: static; margin-top: 60px}
         body > .container {font-size: 18px; margin-top: 12vh}
+        body > .container .btn {width: 240px}
+        .get-started {border: 1px solid #f00; padding: 30px 15px}
         @media (max-width: 767px) {
             body > .container {margin-top: 10vh}
         }
@@ -30,25 +32,43 @@
     <div class="container">
         <div class="text-center">
             <img class="main-img" src="{% static 'foulassi/img/foulassi_splash.png' %}" />
-            <h2 class="main-title text-center" style="padding-bottom: 4vh">{% blocktrans %}Invitation from {{ company_name }}{% endblocktrans %}</h2>
+            <h2 class="main-title text-center" style="padding-bottom: 4vh">
+                {% blocktrans with company_name=service.project_name %}Invitation from {{ company_name }}{% endblocktrans %}
+            </h2>
         </div>
         <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
             <div>
-                {% blocktrans with client_name=user.first_name service_url=dara_service.url %}
-                    <p>Your school management platform and website are now online on <a target="_blank" href="{{ service_url }}"> {{ service_url }}</a>.</p>
-                    <ul style="line-height: 28px">
-                        <li>Complete setup by adding levels, classrooms, students, teachers and collaborators.</li>
-                        <li>Set school fees to accept online Mobile Money payment.</li>
-                        <li>Invite parents on <strong>Foulassi MyKids</strong> application and set fees for that service.</li>
-                    </ul>
-                    <p>It's all very easy to do and will take only a few minutes!</p>
-                {% endblocktrans %}
+                <p>{% blocktrans with company_name=service.project_name %}
+                    <strong>{{ company_name }}</strong> is inviting you to become partner through Daraja program.
+                    Get {{ share_rate }}% for online purchases made by people you refer.
+                    You receive money immediately after transactions.
+                {% endblocktrans %}</p>
                 <div class="clearfix"></div>
             </div>
-            <div class="text-center" style="margin-top: 5vh">
-                <a class="btn btn-deep-blue continue processing" style="min-width: 240px">
+            <div class="text-center accept" style="margin-top: 5vh">
+                <button class="btn btn-deep-blue">
                     {% include 'core/snippets/button_spinner.html' %}
-                    <strong>{% trans "Continue" %}</strong>
+                    <strong>{% trans "Accept" %}</strong>
+                </button>
+            </div>
+            <div class="text-center get-started" style="display: none; font-size: .9em; margin-top: 5vh">
+                <p class="text-danger">{% blocktrans with company_name=service.project_name %}
+                    You're not yet on Daraja. You must join the program before you can
+                    partnership with {{ company_name }}.
+                {% endblocktrans %}</p>
+                <a href="{% url 'daraja:home' %}?inviter={{ ikwen_name }}" class="btn btn-green">
+                    {% include 'core/snippets/button_spinner.html' %}
+                    <strong>{% trans "Join the program" %}</strong>
+                </a>
+            </div>
+            <div class="col-xs-12 col-sm-10 col-sm-offset-1 text-center invitation-accepted" style="display: none; font-size: .9em; margin-top: 5vh">
+                <p class="text-success">{% blocktrans with company_url=service.url company_name=service.project_name %}
+                    Great! You are now partner with {{ company_name }}. Get {{ share_rate }}% for getting someone to buy
+                    online on {{ company_url }}. You must invite them first by sharing your link below.
+                {% endblocktrans %}</p>
+                <a href="{% url 'ikwen:company_profile' ikwen_name %}?referrer={{ user.id }}" class="btn btn-green">
+                    {% include 'core/snippets/button_spinner.html' %}
+                    <strong>{% trans "Invite someone now" %}</strong>
                 </a>
             </div>
             <div class="clearfix"></div>
@@ -60,10 +80,19 @@
     {{ block.super }}
     <script>
         (() => {
-            setTimeout(() => {
-                let href = "{{ school.url }}{% url 'foulassi:admin_home' %}?action=get_in&challenge={{ school.api_signature }}";
-                $('.btn.continue').removeClass('processing').attr('href', href);
-            }, 5000);
+            $('.accept .btn').click(() => {
+                let _$btn = $(this);
+                _$btn.addClass('processing');
+                $.getJSON('', {action: 'accept'}, function(data) {
+                    _$btn.removeClass('processing');
+                    if (data.error) {
+                        //$('.accept, .get-started').toggle()
+                        $('.accept, .invitation-accepted').toggle()
+                    } else if (data.success) {
+                        $('.accept, .invitation-accepted').toggle()
+                    }
+                })
+            });
         })()
     </script>
 

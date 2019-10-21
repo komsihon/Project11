@@ -77,9 +77,9 @@ def login_router(request, *args, **kwargs):
     member = request.user
     app = Application.objects.get(slug=DARAJA)
     try:
-        dara_service = Service.objects.get(app=app, member=member)
+        Service.objects.get(app=app, member=member)
         next_url = reverse('daraja:dashboard')
-    except:
+    except Service.DoesNotExist:
         next_url = reverse('daraja:home')
     return HttpResponseRedirect(next_url)
 
@@ -179,6 +179,15 @@ class InviteDara(TemplateView):
     template_name = 'daraja/invite_dara.html'
     model = Dara
 
+    def get_context_data(self, **kwargs):
+        context = super(InviteDara, self).get_context_data(**kwargs)
+        ikwen_name = kwargs['ikwen_name']
+        service = get_object_or_404(Service, project_name_slug=ikwen_name)
+        # daraja_config = DarajaConfig.objects.get(service=service)
+        context['company'] = service
+        # context['share_rate'] = daraja_config.referrer_share_rate
+        return context
+
     def get(self, request, *args, **kwargs):
         ikwen_name = kwargs['ikwen_name']
         company = get_object_or_404(Service, project_name_slug=ikwen_name)
@@ -187,12 +196,12 @@ class InviteDara(TemplateView):
         if action == 'accept':
             member = request.user
             if member.is_anonymous():
-                response = {'error': "Please login first"}
+                response = {'error': "anonymous_user"}
                 return HttpResponse(json.dumps(response), 'content-type: text/json')
             try:
-                dara_service = Service.objects.using(UMBRELLA).get(app=app, member=member)
+                dara_service = Service.objects.get(app=app, member=member)
             except Service.DoesNotExist:
-                response = {'error': "Not yet Dara"}
+                response = {'error': "not_yet_dara"}
                 return HttpResponse(json.dumps(response), 'content-type: text/json')
             company_db = company.database
             add_database(company_db)

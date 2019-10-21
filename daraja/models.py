@@ -7,6 +7,7 @@ from ikwen.accesscontrol.models import Member
 
 
 DARAJA = "daraja"
+DARAJA_IKWEN_SHARE_RATE = 10
 DARA_REQUESTED_ACCESS = "DaraRequestAccess"
 REFEREE_JOINED_EVENT = "RefereeJoined"
 

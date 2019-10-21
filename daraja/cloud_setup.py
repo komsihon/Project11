@@ -13,12 +13,12 @@ from permission_backend_nonrel.models import UserPermissionList, GroupPermission
 
 from ikwen.accesscontrol.backends import UMBRELLA
 from ikwen.accesscontrol.models import SUDO, Member
-from ikwen.core.models import Service, SERVICE_DEPLOYED, Application
+from ikwen.core.models import Service, SERVICE_DEPLOYED, Application, Config
 from ikwen.core.tools import generate_random_key
 from ikwen.core.utils import add_database_to_settings, add_event, get_mail_content, \
     get_service_instance
 
-from daraja.models import DARAJA
+from daraja.models import DARAJA, DARAJA_IKWEN_SHARE_RATE
 
 import logging
 logger = logging.getLogger('ikwen')
@@ -103,6 +103,11 @@ def deploy(member):
     obj_list, created = UserPermissionList.objects.using(database).get_or_create(user=member)
     obj_list.save(using=database)
     logger.debug("Member %s successfully added to sudo group for service: %s" % (member.username, pname))
+    config = Config(service=service, cash_out_rate=DARAJA_IKWEN_SHARE_RATE,
+                    currency_code='XAF', currency_symbol='XAF', decimal_precision=0,
+                    company_name=ikwen_name, contact_email=member.email, contact_phone=member.phone,
+                    sms_api_script_url=SMS_API_URL)
+    config.save(using=UMBRELLA)
     service.save(using=database)
 
     # Send notification and Invoice to customer
