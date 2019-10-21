@@ -1,0 +1,150 @@
+{% extends "core/base_bs.html" %}
+{% load i18n static cache %}
+{% block meta %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.IKWEN_MEDIA_URL }}ikwen/favicons/{{ service.app.slug }}/apple-icon-180x180.png">
+    <link rel="shortcut icon" type="image/png" href="{% static "foulassi/img/foulassi_logo.png" %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ settings.IKWEN_MEDIA_URL }}ikwen/favicons/{{ service.app.slug }}/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ settings.IKWEN_MEDIA_URL }}ikwen/favicons/{{ service.app.slug }}/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ settings.IKWEN_MEDIA_URL }}ikwen/favicons/{{ service.app.slug }}/favicon-16x16.png">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ settings.IKWEN_MEDIA_URL }}ikwen/favicons/{{ service.app.slug }}/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+{% endblock %}
+
+{% block page_title %}<title>Daraja - ikwen</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <link rel='stylesheet' href="{% static 'daraja/css/daraja.css' %}" />
+    <style>
+        body {background: #f8f6f6}
+        @media (max-width: 767px) {
+            #navbar .menu-button {display: none}
+            #navbar .navbar-brand {margin-left: 20px}
+            .company-list .main-title {display: none}
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="content" class="container">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="search-school">
+                <form class="col-sm-8 col-sm-offset-2">
+                    <label for="company-name" class="sr-only">{% trans "Search for a company" %}</label>
+                    <div class="input-group">
+                        <input id="company-name" class="form-control" type="text" name="q"
+                               placeholder="{% trans "Company name" %}" autofocus autocomplete="off"/>
+                        <div class="do-search input-group-addon">
+                            <i class="fa fa-search" style="color: #555"></i>
+                        </div>
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            </div>
+            {% if object_list %}
+                <div class="company-list">
+                    <ul class="object-list" style="padding-left: 0">
+                        {% for company in object_list %}
+                            {% with config=company.config %}
+                            <li id="{{ company.id }}" class="ik-li" data-id="{{ company.id }}">
+                                {% if config.logo.name %}
+                                    <div class="image" style="background-image: url({{ settings.IKWEN_MEDIA_URL }}{{ company.photo.small_name }})"></div>
+                                {% else %}
+                                    <div class="image" style="background-image: url({% static 'ikwen/img/login-avatar.jpg' %})"></div>
+                                {% endif %}
+                                <div class="info">
+                                    <h3 class="full_name">{{ config.company_name }}</h3>
+                                    <ul class="text-muted">
+                                        <li class="annual-turnover">{{ config.contact_phone|truncatechars:"20" }}</li>
+                                        <li class="location"></li>
+                                        <li class="location">{{ config.contact_email }}</li>
+                                    </ul>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn btn-sm btn-green show-modal-request">{% trans "Request" %}</button>
+                                </div>
+                            </li>
+                            {% endwith %}
+                        {% endfor %}
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+            {% else %}
+                <div style="margin-top: 6vh; text-align: center">
+                    <h4>{{ request.GET.q }}</h4>
+                    <p class="text-muted">{% trans "Sorry! No result found." %}</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="modal fade" id="modal-invite-company" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-info">
+                <div class="modal-header" style="border-bottom: none">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body row">
+                    <h4 class="col-xs-12 title" style="font-weight: 600; margin: -40px 0 10px"></h4>
+                    <p class="col-xs-12 notice">
+                        {% trans "Please write the names and classrooms of your kid(s) so that we can easily find and link them to you." %}
+                    </p>
+                    <div class="form-group col-xs-12">
+                        <label for="kids-details" class="sr-only">{% trans "Kids'details" %}</label>
+                        <textarea id="kids-details" class="form-control" style="height: 150px"
+                                  placeholder="{% blocktrans %}Simo Mballa, Form 6 A&#10;Youego Mballa, Form 2 C{% endblocktrans %}"></textarea>
+                    </div>
+                    {% include 'core/snippets/spinner.html' %}
+                    <div class="actions col-xs-12 col-sm-4">
+                        <button class="btn btn-green btn-md btn-block do-invite-company">
+                            {% include 'core/snippets/button_spinner.html' %}
+                            <span>{% trans "Submit" %}</span>
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        (function() {
+            var $company, companyId, companyName;
+            $('.suggestion-list .ik-li').click(function() {
+                if ($(window).width() < 768) {
+                    $(this).find('.actions').css('bottom', '-30vh').animate({'bottom': 0})
+                }
+            });
+            $('.show-modal-request').click(function() {
+                $company = $(this).parents('.ik-li');
+                companyId = $company.data('id');
+                companyName = $company.find('.full_name').text();
+                $('#modal-invite-company .title').text("{% trans 'Invite' context 'invite company ...' %}" + " " + companyName);
+                $('#modal-invite-company').modal('show');
+                $('#kids-details').delay(1000).focus();
+            });
+            $('.do-invite-company:not(.processing)').click(function() {
+                var _$btn = $(this),
+                    kidsDetails = $('#kids-details').val();
+                $('#modal-invite-company .form-group').removeClass('has-error');
+                if (!kidsDetails) {
+                    $('#kids-details').parents('.form-group').addClass('has-error');
+                    return
+                }
+                _$btn.addClass('processing');
+                $.getJSON('', {action: 'invite_company', company_id: companyId, kids_details: kidsDetails}, function(resp) {
+                    _$btn.removeClass('processing');
+                    if (resp.success) {
+                        $('#modal-invite-company').modal('hide');
+                        ikwen.showFloatingNotice("{% trans "Your request was submitted" %}");
+                        $company.find('.actions').remove();
+                    }
+                })
+            });
+        })()
+    </script>
+{% endblock %}

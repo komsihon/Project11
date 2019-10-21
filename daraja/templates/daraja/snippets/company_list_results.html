@@ -1,0 +1,44 @@
+{% load i18n static humanize %}
+{% include 'core/snippets/spinner.html' %}
+
+<ul class="object-list" style="padding-left: 0">
+    {% for company in objects_page.object_list %}
+        {% with config=company.config %}
+        <li id="{{ company.id }}" class="ik-li list-group-item" data-id="{{ company.id }}">
+            {% if config.logo.name %}
+                <div class="image rounded" style="background-image: url({{ settings.IKWEN_MEDIA_URL }}{{ company.photo.small_name }})"></div>
+            {% else %}
+                <div class="image rounded" style="background-image: url({% static 'ikwen/img/login-avatar.jpg' %})"></div>
+            {% endif %}
+            <div class="info">
+                <a href="{{ company.url }}">{{ company.project_name }}</a>
+                <p class="about">{{ config.currency_symbol }} {{ company.total_earnings|intcomma }}</p>
+            </div>
+            <div class="actions">
+                <button class="btn btn-sm btn-danger show-modal-leave">{% trans "Leave" %}</button>
+            </div>
+        </li>
+        {% endwith %}
+    {% endfor %}
+</ul>
+{% if objects_page.paginator.num_pages > 1 %}
+<ul class="pagination">
+    <li class="disabled" data-val="first"><a href="javascript:;" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+    {% for page in page_range %}
+        <li class="page{% if page == objects_page.number %} active{% endif %}" data-val="{{ page }}">
+            <a href="javascript:;">
+                {{ page }} {% if page == objects_page.number %}<span class="sr-only">(current)</span>{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    <li data-val="-1"><a href="javascript:;" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+</ul>
+{% endif %}
+<div id="page-navigation" class="text-muted">
+    {% if objects_page.paginator.num_pages > 1 %}
+        <p>{% blocktrans with count=objects_page.paginator.count start=objects_page.start_index end=objects_page.end_index %}
+            {{ start }} – {{ end }} of {{ count }} results{% endblocktrans %}</p>
+    {% else %}
+        <p>{% blocktrans with count=objects_page.paginator.count %}{{ count }} results{% endblocktrans %}</p>
+    {% endif %}
+</div>

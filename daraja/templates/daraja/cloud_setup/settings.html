@@ -1,0 +1,245 @@
+"""
+Django settings for Foulassi project.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/1.6/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/1.6/ref/settings/
+"""
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import os
+from django.utils.translation import ugettext_lazy as _
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = '{{ secret_key }}'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+TESTING = False
+
+TEMPLATE_DEBUG = True
+
+ALLOWED_HOSTS = [{{ allowed_hosts|safe }}, "ikwen.com", "go.ikwen.com"]
+
+SESSION_COOKIE_NAME = 'fl_sessionid'
+
+
+# Application definition
+
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.webdesign',
+    'django.contrib.humanize',
+
+    #Third parties
+    'djangotoolbox',
+    'django_user_agents',
+    'ajaxuploader',
+    'currencies',
+
+    'ikwen.core',
+    'ikwen.accesscontrol',
+    'ikwen.billing',
+    'ikwen.flatpages',
+    'ikwen.cashout',
+    'ikwen.theming',
+
+    'ikwen_webnode.web',
+    'ikwen_webnode.webnode',
+    'ikwen_webnode.items',
+    'ikwen_webnode.blog',
+
+    'ikwen_foulassi.foulassi',
+    'ikwen_foulassi.reporting',
+    'ikwen_foulassi.school',
+
+    'echo',
+)
+
+MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
+    'ikwen.core.middleware.ServiceStatusCheckMiddleware',
+    'ikwen.core.middleware.HideError403Middleware',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.contrib.messages.context_processors.messages",
+    'django.core.context_processors.request',
+    'currencies.context_processors.currencies',
+    'ikwen.core.context_processors.project_settings',
+    'ikwen.billing.context_processors.payment_means',
+    'ikwen_webnode.webnode.context_processors.menu_list',
+    'ikwen_foulassi.foulassi.context_processors.echo_balance',
+    'ikwen_foulassi.foulassi.context_processors.event_count',
+    'ikwen_foulassi.foulassi.context_processors.current_session',
+)
+
+ROOT_URLCONF = 'ikwen_foulassi.conf.urls'
+
+WSGI_APPLICATION = 'conf.wsgi.application'
+
+if DEBUG or TESTING:
+    WALLETS_DB = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/home/komsihon/Dropbox/PycharmProjects/ikwen/db.sqlite3',
+    }
+else:
+    WALLETS_DB = {  # ikwen_kakocase.ikwen_kakocase relational database used to store sensitive objects among which CashOutRequest
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ikwen_wallets',
+        'USER': 'root',
+        'PASSWORD': 'admin'
+    }
+
+# Database
+# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django_mongodb_engine', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '{{ ikwen_name }}',
+    },
+    'umbrella': {
+        'ENGINE': 'django_mongodb_engine', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'ikwen_umbrella_prod',
+    },
+    'wallets': WALLETS_DB
+}
+
+# Internationalization
+# https://docs.djangoproject.com/en/1.6/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = False
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('fr', _('French')),
+)
+
+LOCALE_PATHS = (
+    '/home/komsihon/Dropbox/PycharmProjects/Apps/Foulassi/locale',
+    '/home/komsihon/Dropbox/PycharmProjects/WebNode/locale',
+    '/home/komsihon/Dropbox/PycharmProjects/ikwen/locale',
+)
+
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/var/www/example.com/media/"
+MEDIA_ROOT = '{{ media_root }}'
+REPORT_CARDS_ROOT = '{{ report_cards_root }}'
+
+# URL that handles the media served from MEDIA_ROOT. Make sure to use a
+# trailing slash.
+# Examples: "http://example.com/media/", "http://media.example.com/"
+MEDIA_URL = '{{ media_url }}'
+REPORT_CARDS_URL = '{{ report_cards_url }}'
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.6/howto/static-files/
+STATIC_ROOT = '{{ static_root }}'
+STATIC_URL = '{{ static_url }}'
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR,  'templates'),
+    '/home/komsihon/Dropbox/PycharmProjects/WebNode/templates',
+    '/home/komsihon/Dropbox/PycharmProjects/ikwen/templates',
+)
+
+LOGIN_URL = 'ikwen:sign_in'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+
+#  *******       IKWEN CONFIGURATION       *******      #
+
+IKWEN_SERVICE_ID = '{{ service.id }}'
+
+PROJECT_URL = '{{ service.url }}'
+
+AUTH_USER_MODEL = 'accesscontrol.Member'
+
+AUTHENTICATION_BACKENDS = (
+    'permission_backend_nonrel.backends.NonrelPermissionBackend',
+    'ikwen.accesscontrol.backends.LocalDataStoreBackend',
+)
+
+IKWEN_LOGIN_EVENTS = ('ikwen_foulassi.foulassi.utils.grant_teacher_permissions', )
+
+IKWEN_BASE_URL = 'http://www.ikwen.com'  # Used only for dev purposes (DEBUG = False)
+
+WSGI_SCRIPT_ALIAS = '/{{ ikwen_name }}'  # Used only for dev purposes (DEBUG = False)
+
+IKWEN_CONFIG_MODEL = 'foulassi.SchoolConfig'
+IKWEN_CONFIG_MODEL_ADMIN = 'ikwen_foulassi.foulassi.admin.SchoolConfigAdmin'
+
+# STAFF_ROUTER describes how staff users are routed upon login.
+# It is a list of tuples each containing at least 2 elements,
+# the first being the permission, the second being
+# the url name, or raw url where to route if user having that permission
+# The third element if exists will be the passed as *args for the url
+# or **kwargs depending if it's a tuple or a dictionary
+# Note that the Superuser will always be routed to the first url
+# since he has all permissions
+#
+# Eg:
+# STAFF_ROUTER = (
+#     ('app_label.view_dashboard', 'app_label:dashboard'),
+#     ('app_label.manage_orders', 'app_label:order_list')
+# )
+STAFF_ROUTER = (
+    ('ikwen_foulassi.foulassi.utils.access_classroom', 'school:classroom_list'),
+    ('school.ik_manage_school', 'school:classroom_list'),
+    ('school.ik_access_scores', 'school:classroom_list'),
+)
+
+# Products manipulated by billing app is bound to a certain duration and a cost
+# Billing cycles are not taken into consideration in this case.
+SEPARATE_BILLING_CYCLE = True
+BILLING_INVOICE_MODEL = 'foulassi.Invoice'
+BILLING_PAYMENT_MODEL = 'foulassi.Payment'
+
+
+#  *******       E-mail CONFIGURATION       *******  #
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'ksihon'
+EMAIL_HOST_PASSWORD = 'T33nT!t@n5'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+
+#  *******       LOGGING      *******  #
+import logging
+from ikwen.core.log import LOGGING
+logging.config.dictConfig(LOGGING)

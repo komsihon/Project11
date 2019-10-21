@@ -1,0 +1,110 @@
+{% extends "core/app_base_admin.html" %}
+{% load i18n static cache %}
+
+{% block page_title %}<title>{% trans "Your companies" %} - ikwen</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <link rel='stylesheet' href="{% static 'foulassi/css/foulassi-kids.css' %}" />
+    <style>
+        #admin-tools .btn.add {display: none}
+    </style>
+{% endblock %}{% load i18n humanize staticfiles admin_list %}
+
+{% block breadcrumb_location %}
+    <li>{{ verbose_name_plural|capfirst }}</li>
+{% endblock %}
+
+{% block admin_content %}
+    <div id="admin-content">
+        <div class="container-fluid stage">
+            {% include 'core/snippets/admin_tools.html' %}
+            <div id="results">
+                {% include 'core/snippets/spinner.html' %}
+                {% if object_list %}
+                    {% include 'daraja/snippets/company_list_results.html' %}
+                    <div class="text-center" style="border-top: 1px solid #ddd; clear: both; margin: 3vh 15px; padding-top: 2vh">
+                        <p class="notice">{% blocktrans %}Invite a company on Daraja.{% endblocktrans %}</p>
+                        <button class="btn btn-green visible-xs" data-toggle="modal" data-target="#whatsapp-share" style="margin: auto; width: 100%">
+                            {% trans "Send invitation" %}
+                        </button>
+                        <div class="clearfix"></div>
+                    </div>
+                {% else %}
+                    <div id="stage" class="empty-list">
+                        <p class="notice">{% blocktrans %}
+                            You can start add levels only after you have added subjects.
+                        {% endblocktrans %}</p>
+                        <div class="search-school">
+                            <form class="col-sm-8 col-sm-offset-2" action="{% url 'daraja:search_company' %}">
+                                <label for="school-name" class="sr-only">{% trans "Search for a company" %}</label>
+                                <div class="input-group">
+                                    <input id="school-name" class="form-control" type="text" name="q"
+                                           placeholder="{% trans "Company name" %}" autofocus autocomplete="off"/>
+                                    <div class="do-search input-group-addon">
+                                        <i class="fa fa-search" style="color: #555"></i>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div>
+                            <button class="btn btn-green visible-xs" data-toggle="modal" data-target="#whatsapp-share">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                {% trans "Send invitation" %}
+                            </button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {#    Modal declaration : BEGIN #}
+    <div class="modal fade" id="whatsapp-share" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-info">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">{% trans "Share on WhatsApp" %}</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <form onclick="return false" class="form-horizontal">
+                        <div class="form-group row">
+                            <label for="whatsapp-share-msg" class="col-sm-5 col-md-4">{% trans "Message" %}</label>
+                            <div class="col-sm-7 col-md-8">
+                                <textarea id="whatsapp-share-msg" style="height: 120px"
+                                          class="form-control input-sm">{% blocktrans with school_name=config.company_name %}Hello! This is our Foulassi platform for collaborating online in {{ school_name }}. Please, join in for us to configure your access.{% endblocktrans %}</textarea>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="actions">
+                        <div class="col-xs-12 col-sm-4 col-md-3 pull-right action">
+                            <button class="btn btn-success btn-block btn-sm ok"
+                                    data-dismiss="modal" aria-label="OK">OK</button>
+                        </div>
+                        <div class="col-xs-12 col-sm-4 col-md-3 pull-right action">
+                            <button class="btn btn-default btn-block btn-sm"
+                                    data-dismiss="modal" aria-label="Close">{% trans "Cancel" %}</button>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {#    Modal declaration : END #}
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script>
+        (() => {
+            $('body').on('click', '#whatsapp-share .btn.ok', () => {
+                let msg = $('#whatsapp-share-msg').val(),
+                    url = 'https://ikwen.com/tsunami/{{ service.project_name_slug }}/?invite%3Dyes%26group%3Dteachers';
+                window.location = 'https://api.whatsapp.com/send?text=' + url + '%0A%0A' + msg;
+            });
+        })()
+    </script>
+{% endblock %}

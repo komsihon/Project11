@@ -1,0 +1,63 @@
+/**
+    Document   : daraja
+    Created on : Oct 08, 2019, 11:14
+    Contributors     : Kom Sihon
+    Description:
+        Daraja extra styles
+*/
+
+#app-nav {display: none;overflow: hidden;height: 0;}
+#content {min-height: 90vh}
+.search-company {margin: 5vh 0 2vh;}
+.company-list .ik-li {padding: 2px;height: 120px}
+/*.company-list .ik-li .actions {margin-top: 75px}*/
+.company-list .ik-li .btn.show-modal-request {margin-top: 75px; width: 150px}
+.company-list .ik-li:hover {background: #fff}
+.company-list .ik-li .image {height: 100%;background-size: cover;width: 120px;}
+.company-list .ik-li .info {padding: 10px 0;}
+.company-list .ik-li h3 {font-weight: 700; margin: 0 0 20px}
+.company-list .ik-li ul {padding-left: 0}
+.company-list .ik-li ul li {border-bottom: 1px solid #ddd;display: block;height: 40px;padding-top: 8px;}
+.company-list .ik-li ul li:first-child {height: 32px;padding-top: 0}
+.company-list .ik-li ul li:last-child {border-bottom: #fff}
+.kid .status-bullet {border: 2px solid #fff;box-sizing: content-box;float: right;height: 10px;width: 10px;}
+.kid .img-thumbnail {border-radius: 50%}
+#modal-confirm-accept .modal-body, #modal-confirm-refuse .modal-body {padding-top: 0}
+#modal-confirm-accept h3, #modal-confirm-refuse h3 {margin-top: -15px}
+#modal-confirm-accept .notice, #modal-confirm-refuse .notice {margin-bottom: 42px}
+#admin-nav .ik-li .info {width: 167px;}
+.title-brand {font-weight: 600;padding: 0 10px;font-size: 21px}
+.title-brand:hover {text-decoration:none}
+.pending-invoices .payment-start {margin-top: 1vh;min-width: 150px;}
+#search-other-school {border-top: 1px solid #eee; margin-top: 6vh; padding-top: 2vh}
+#search-other-school h4 {font-weight: 700}
+#search-other-school .search-company {margin-top: 3vh}
+.member:not(.tpl):last-child, .ik-li:not(.tpl):last-of-type {border-bottom: none}
+.school-avatar {font-size: 60px;color: #bfc5d8;line-height: 80px;}
+
+@media (max-width: 767px) {
+    .company-list {margin: 0 -12px}
+    .company-list .ik-li h3 {font-size: 18px;margin-bottom: 10px;}
+    .company-list .ik-li .info {padding: 3px 0 10px;max-width: 180px;}
+    .company-list .ik-li ul li {height: 30px;padding-top: 4px;}
+    .company-list .ik-li ul li:first-child {height: 26px;padding-top: 0}
+    .title-brand {margin-top: 3vh;display: block;}
+    div#container.admin {padding-top: 55px;}
+    #student-details .basic {clear: both;padding-top: 15px;}
+    .ik-li:not(.selected):hover .actions {right: 15px;}
+}
+
+@media (min-width: 768px) {
+    .company-list .ik-li {box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .15); padding: 2px 10px 2px 2px;height: 200px; margin-bottom: 8px}
+    .company-list .ik-li .image {width: 200px;}
+    .company-list .ik-li .info {max-width: 260px}
+    div#container.admin {padding-top: 65px}
+}
+@media (min-width: 992px) {
+    .title-brand {margin-top: -2px;}
+    .company-list .ik-li .info {max-width: 280px;}
+    .company-list .ik-li .btn.show-modal-request {margin-top: 75px; width: 180px}
+}
+@media (min-width: 1200px) {
+    .company-list .ik-li .info {max-width: 395px;}
+}

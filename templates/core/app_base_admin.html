@@ -1,0 +1,33 @@
+{% extends "core/base_admin.html" %}
+{% load i18n humanize staticfiles cache auth_tokens %}
+
+{% block admin_nav %}
+    {% cache 600 sidebar user.username %}
+    <div id="admin-nav" class="edge-panel-left">
+        <div class="wrapper">
+            <div class="stage">
+                <div class="menu">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li role="presentation" class="dashboard">
+                            <a href="{% url 'daraja:dashboard' %}">{% trans "Dashboard" %}</a>
+                        </li>
+                        <li role="presentation" class="home">
+                            <a href="{% url 'daraja:company_list' %}">{% trans "Your companies" %}</a>
+                        </li>
+                        <li role="presentation" class="home">
+                            <a href="{% url 'daraja:change_profile' %}">{% trans "Profile" %}</a>
+                        </li>
+                    </ul>
+                    <div class="divider"></div>
+                    <ul class="nav nav-pills nav-stacked">
+                        <li role="presentation" class="home">
+                            <a href="{% url 'daraja:registered_company_list' %}">{% trans "Add new company" %}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+    {% endcache %}
+{% endblock %}
